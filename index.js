@@ -1052,9 +1052,13 @@ ZWayServerAccessory.prototype = {
                 return Characteristic.CurrentHeatingCoolingState.HEAT;
             };
 
-            // cx.value = cx.zway_getValueFromVDev(vdev);
+            cx.on('get', interlock(function(callback, context) {
+                var mode = this.platform.getTagValue(vdev, "Override.ThermostatMode");
 
-            cx.on('get', interlock(function(callback, context){ 
+                if (mode) {
+                    return callback(Characteristic.CurrentHeatingCoolingState[mode]);
+                }
+
                 this.zWaveAPIRun(vdev, "ThermostatMode.data.mode.value").then(function(result){
                     callback(false, parseInt(result) == 0 ? Characteristic.CurrentHeatingCoolingState.Off
                         : Characteristic.CurrentHeatingCoolingState.HEAT);
@@ -1069,20 +1073,17 @@ ZWayServerAccessory.prototype = {
         }
 
         if(cx instanceof Characteristic.TargetHeatingCoolingState){
-            //TODO: Always HEAT for now, we don't have an example to work with that supports another function.
-            cx.zway_getValueFromVDev = function(vdev){
-                return Characteristic.TargetHeatingCoolingState.HEAT;
-            };
-
-            // cx.value = cx.zway_getValueFromVDev(vdev);
-
             cx.on('get', interlock(function(callback, context){
+                var mode = this.platform.getTagValue(vdev, "Override.ThermostatMode");
+
+                if (mode) {
+                    return callback(Characteristic.CurrentHeatingCoolingState[mode]);
+                }
 
                 this.zWaveAPIRun(vdev, "ThermostatMode.data.mode.value").then(function(result){
                     callback(false, parseInt(result) == 0 ? Characteristic.CurrentHeatingCoolingState.Off
                         : Characteristic.CurrentHeatingCoolingState.HEAT);
                 });
-
             }.bind(this)));
 
             // Hmm... apparently if this is not setable, we can't add a thermostat change to a scene. So, make it writable but a no-op.
