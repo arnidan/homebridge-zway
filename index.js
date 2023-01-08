@@ -592,6 +592,10 @@ ZWayServerAccessory.prototype = {
             case "sensorBinary.alarm_flood":
                 services.push(new Service.LeakSensor(vdev.metrics.title, vdev.id));
                 break;
+            case "sensorBinary.Motion":
+            case "sensorBinary.motion":
+                services.push(new Service.MotionSensor(vdev.metrics.title, vdev.id));
+                break;
             case "doorlock":
                 services.push(new Service.LockMechanism(vdev.metrics.title, vdev.id));
                 break;
@@ -672,6 +676,7 @@ ZWayServerAccessory.prototype = {
 	    	map[(new Characteristic.ValveType).UUID] = ["switchBinary"];
             map[(new Characteristic.Active).UUID] = ["switchBinary"];
 	    	map[(new Characteristic.InUse).UUID] = ["switchBinary"];
+            map[(new Characteristic.MotionDetected).UUID] = ["sensorBinary.motion", "sensorBinary.Motion"];
         }
 
         if(cx instanceof Characteristic.Name) return vdevPreferred;
